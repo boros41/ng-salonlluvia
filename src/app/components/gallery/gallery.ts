@@ -18,6 +18,7 @@ import ImageFilters from "../../dto/gallery/image-filters";
 import Hairstyle from "../../dto/gallery/hairstyle";
 import HairColor from "../../dto/gallery/hair-color";
 import { CdkAutofill } from "@angular/cdk/text-field";
+import { environment } from "../../../environments/environment";
 
 @Component({
     selector: "gallery",
@@ -107,7 +108,12 @@ export class Gallery implements OnInit, AfterViewInit {
     }
 
     private fetchImages(queryParams?: URLSearchParams): void {
-        const url = `https://api.salonlluvia.com/azureblobstorage/image-url?${queryParams?.toString()}`;
+        let url: string;
+        if (environment.production) { // prod is a subdomain
+            url = `${environment.apiUrl}/azureblobstorage/image-url?${queryParams?.toString()}`;
+        } else {
+            url = `${environment.apiUrl}/api/azureblobstorage/image-url?${queryParams?.toString()}`;
+        }
 
         this.http.get<Images>(url, { observe: "response" })
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -116,7 +122,7 @@ export class Gallery implements OnInit, AfterViewInit {
                     if (response.status === 204 || response.body === null) {
                         console.log("No images to display!");
                         let noImagesMessage = "Lo sentimos, por el momento no hay imágenes disponibles ";
-                        
+
                         if (queryParams) {
                             noImagesMessage += queryParams.size > 1 ? "con esos filtros." : "con ese filtro.";
                         }
@@ -125,7 +131,7 @@ export class Gallery implements OnInit, AfterViewInit {
 
                         return;
                     }
-                    
+
                     // will trigger the template's loop to add or remove images which will trigger _observer above
                     // Angular will automatically remove the element nodes via the template's "for track" if the response contains less images than the signal
                     // https://angular.dev/guide/templates/control-flow#why-is-track-in-for-blocks-important
@@ -150,7 +156,12 @@ export class Gallery implements OnInit, AfterViewInit {
 
     // populates the filter checkboxes
     private fetchImageFilters(): void {
-        const url = "https://api.salonlluvia.com/azureblobstorage/filters";
+        let url: string;
+        if (environment.production) { // prod is a subdomain
+            url = `${environment.apiUrl}/azureblobstorage/filters`;
+        } else {
+            url = `${environment.apiUrl}/api/azureblobstorage/filters`;
+        }
 
         this.http.get<ImageFilters>(url, { observe: "response" })
             .pipe(takeUntilDestroyed(this.destroyRef))

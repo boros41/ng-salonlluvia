@@ -9,6 +9,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import ErrorService from "../../services/error/error-service";
 import Hairstyle from "../../dto/gallery/hairstyle";
 import NotificationService from "../../services/notification/notification-service";
+import { environment } from "../../../environments/environment";
 
 @Component({
   selector: 'image-upload-content-dialog',
@@ -73,7 +74,12 @@ export class ImageUploadContentDialog {
   }
 
   uploadImage(): void {
-    const url = "https://api.salonlluvia.com/azureblobstorage/upload"
+    let url: string;
+    if (environment.production) { // prod is a subdomain
+      url = `${environment.apiUrl}/azureblobstorage/upload`;
+    } else {
+      url = `${environment.apiUrl}/api/azureblobstorage/upload`;
+    }
 
     console.log("Uploading image...");
 
@@ -103,24 +109,24 @@ export class ImageUploadContentDialog {
       credentials: 'include',
       observe: "response"
     })
-    .pipe(takeUntilDestroyed(this._destroyRef))
-    .subscribe({
-      next: (response: HttpResponse<any>) => {
-        console.log("Successfully uploaded image");
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe({
+        next: (response: HttpResponse<any>) => {
+          console.log("Successfully uploaded image");
 
-        if (response.body) {
-          // backend returns an anonymous object with a detail property
-          this._notificationService.alert(response.body.detail, 10_000);
+          if (response.body) {
+            // backend returns an anonymous object with a detail property
+            this._notificationService.alert(response.body.detail, 10_000);
+          }
+
+          this._dialogRef.close(true);
+        },
+        error: (error: HttpErrorResponse) => {
+          this._errorService.handleHttpError(error);
+        },
+        complete: () => {
+
         }
-
-        this._dialogRef.close(true);
-      },
-      error: (error: HttpErrorResponse) => {
-        this._errorService.handleHttpError(error);
-      },
-      complete: () => {
-        
-      }
-    });
+      });
   }
 }

@@ -14,7 +14,7 @@ import parsePhoneNumber, { PhoneNumber } from "libphonenumber-js";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import AppointmentModel from "../../models/appointment-model";
 import ProblemDetails from "../../Validation/problem-details";
-
+import {environment} from '../../../environments/environment';
 
 @Component({
     selector: "appointment",
@@ -71,7 +71,12 @@ export class Appointment implements OnInit {
     }
 
     private fetchAvailableDays(): void {
-        const url = "https://api.salonlluvia.com/calendly/available-days";
+        let url: string;
+        if (environment.production) { // prod is a subdomain
+            url = `${environment.apiUrl}/calendly/available-days`;
+        } else {
+            url = `${environment.apiUrl}/api/calendly/available-days`;
+        }
 
         console.log(`Date FormControl: ${this.appointmentForm.controls.date}`)
         console.log(`Date FormControl value: ${this.appointmentForm.value.date}`)
@@ -118,7 +123,12 @@ export class Appointment implements OnInit {
     }
 
     submitAppointment() {
-        const url = "https://api.salonlluvia.com/calendly/appointment";
+        let url: string;
+        if (environment.production) { // prod is a subdomain
+            url = `${environment.apiUrl}/calendly/appointment`;
+        } else {
+            url = `${environment.apiUrl}/api/calendly/appointment`;
+        }
 
         let date = this.appointmentForm.value.date;
         if (!date) {

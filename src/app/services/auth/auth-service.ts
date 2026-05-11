@@ -8,6 +8,7 @@ import ProblemDetails from "../../Validation/problem-details";
 import CurrentUser from "../../dto/account/current-user";
 import ErrorService from "../error/error-service";
 import NotificationService from "../notification/notification-service";
+import { environment } from "../../../environments/environment";
 
 @Injectable({ providedIn: "root" })
 export class AuthenticationService {
@@ -21,10 +22,12 @@ export class AuthenticationService {
     isLoggedIn = signal(false);
 
     login(username: string, password: string, rememberMe: boolean): void {
-        const url = "https://api.salonlluvia.com/account/login?useCookies=true";
-
-        // const username = this.loginForm.value.username;
-        // const password = this.loginForm.value.password;
+        let url: string;
+        if (environment.production) { // prod is a subdomain
+            url = `${environment.apiUrl}/account/login?useCookies=true`;
+        } else {
+            url = `${environment.apiUrl}/api/account/login?useCookies=true`;
+        }
 
         if (!(username || password)) {
             return;
@@ -59,7 +62,12 @@ export class AuthenticationService {
     }
 
     logout(): void {
-        const url = "https://api.salonlluvia.com/account/logout";
+        let url: string;
+        if (environment.production) { // prod is a subdomain
+            url = `${environment.apiUrl}/account/logout`;
+        } else {
+            url = `${environment.apiUrl}/api/account/logout`;
+        }
 
         // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization?view=aspnetcore-9.0#prerequisites:~:text=in%20this%20article.-,Log%20out,-To%20provide%20a
         this._http.post(url, {}, {
@@ -83,32 +91,37 @@ export class AuthenticationService {
     }
 
     fetchUser(): void {
-        const url = "https://api.salonlluvia.com/account/me";
+        let url: string;
+        if (environment.production) { // prod is a subdomain
+            url = `${environment.apiUrl}/account/me`;
+        } else {
+            url = `${environment.apiUrl}/api/account/me`;
+        }
 
         console.log("fetching user...");
-        this._http.get<CurrentUser>(url, {credentials: "include", observe: "response"})
-                .pipe(takeUntilDestroyed(this._destroyRef))
-                .subscribe({
-                    next: (response: HttpResponse<CurrentUser>) => {
-                        const user: CurrentUser | null = response.body; 
+        this._http.get<CurrentUser>(url, { credentials: "include", observe: "response" })
+            .pipe(takeUntilDestroyed(this._destroyRef))
+            .subscribe({
+                next: (response: HttpResponse<CurrentUser>) => {
+                    const user: CurrentUser | null = response.body;
 
-                        console.log(response);
+                    console.log(response);
 
-                        this.isAdmin.set(user?.isAdmin ?? false);
-                        this.isLoggedIn.set(user?.isLoggedIn ?? false);
-                    },
-                    error: () => {
-                        // this will enter for most users since there is only one registered account
-                        // so do nothing since this is really just to show the log in/out buttons in navbar
-                        
-                        // probs redundant since already false if this enters
-                        this.isAdmin.set(false);
-                        this.isLoggedIn.set(false);
-                    },
-                    complete: () => {
+                    this.isAdmin.set(user?.isAdmin ?? false);
+                    this.isLoggedIn.set(user?.isLoggedIn ?? false);
+                },
+                error: () => {
+                    // this will enter for most users since there is only one registered account
+                    // so do nothing since this is really just to show the log in/out buttons in navbar
 
-                    }
-                });
+                    // probs redundant since already false if this enters
+                    this.isAdmin.set(false);
+                    this.isLoggedIn.set(false);
+                },
+                complete: () => {
+
+                }
+            });
 
     }
 }
