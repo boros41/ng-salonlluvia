@@ -1,59 +1,58 @@
-# AngularApp
+# Salon Lluvia Web Application
+This is the **Angular** frontend portion for a local salon's website built to support online appointment scheduling, gallery browsing, and delivery of general business information. View the ASP.NET Core Web API backend portion [here](https://github.com/boros41/salonlluvia).
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.9.
+## Azure Deployment
+This Angular project is deployed on **Microsoft Azure Static Web App** using:
+-  **Angular**
+-  **Angular Components**
+-  **Angular Routing**
+-  **Reactive Forms**
+-  **Angular Validators**
+-  **Angular HttpClient**
+-  **Angular Material UI**
 
-## Development server
+This deployment supports a public-facing business website for a local salon's operation.
 
-To start a local development server, run:
+## Appointment Scheduling Integration
+Communicates with the ASP.NET Core Web API [backend](https://github.com/boros41/salonlluvia) using Angular's HttpClient for requests with the fetch API to receive and send data as JSON for the [Calendly REST API](https://developer.calendly.com/getting-started) in order to:
+- Display only valid appointment dates
+- Populate an Angular Material UI date picker component with available days
+- Submit user input so the backend can validate and schedule their appointment
 
-```bash
-ng serve
-```
+This helps the business provide a smoother booking experience and reach more clients.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Authentication and Authorization
+Client-side validation is used for a better user experience via Angular's built-in validators along with custom ones for emails and phone numbers. However, server side validation is performed on the ASP.NET Core Web API [backend](https://github.com/boros41/salonlluvia) and is the single source of truth. 
 
-## Code scaffolding
+The following data is validated on the client:
+- Phone number
+- Email
+- Appointment date
+- Uploaded images (if the user is authorized)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+This improves page responsiveness as data is validated on the client before making a server HTTP request.
 
-```bash
-ng generate component component-name
-```
+## Cloud Image Storage
+The gallery page makes an HTTP GET request via Angular's HttpClient to the [backend](https://github.com/boros41/salonlluvia) which integrates **Azure Blob Storage** with **Microsoft Entra ID** authentication to securely store and retrieve uploaded gallery images. If a user is authorized with the admin role, they may also upload images.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+This enables:
+- Secure cloud-based image storage
+- Scalable media delivery
+- Public gallery access for site visitors
 
-```bash
-ng generate --help
-```
+## Gallery Page
+Uses the [Masonry](https://masonry.desandro.com/) and [lightbox3](https://lokeshdhakar.com/projects/lightbox3/) JavaScript libraries to provide a responsive image viewing experience with the ability to filter images by gender, hairstyle, and hair color.
 
-## Building
+![Gallery page's masonry layout](https://i.imgur.com/Pkxvw9V.png)
+![Gallery page's lightbox image popup](https://i.imgur.com/aualq6U.png)
 
-To build the project run:
+## Appointment Page
+Uses [Angular Meterial UI](https://material.angular.dev/) components to provide a form for clients to schedule appointments with the salon. Client-side validation is performed with Angular validators. The user's information is sent to the [backend](https://github.com/boros41/salonlluvia) where the appointment is created through the [Calendly REST API](https://developer.calendly.com/getting-started) after server-side validation. 
 
-```bash
-ng build
-```
+![Appointment page](https://i.imgur.com/mC2I6Wc.png)
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Project Highlights
+- Angular frontend application deployed on **Microsoft Azure Static Web App**
+- Real-world business website for a local salon
+-  **Calendly API** integration for appointment automation
+-  **Azure Blob Storage** with **Microsoft Entra ID** for secure image management
